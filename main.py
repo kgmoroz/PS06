@@ -1,5 +1,4 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -9,9 +8,7 @@ import csv
 # Настройки Selenium
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # Запуск браузера в фоновом режиме
-#chrome_service = Service('/path/to/chromedriver')  # Убедитесь, что указали правильный путь к chromedriver
 
-#driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
 driver = webdriver.Chrome(options=chrome_options)
 
 base_url = "https://www.divan.ru/category/svet/page-"
