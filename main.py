@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 import csv
+import traceback
 
 # Настройки Selenium
 chrome_options = Options()
@@ -17,6 +18,7 @@ product_info_list = []
 
 while True:
     url = f"{base_url}{page_number}"
+    print(f"\nЗагружаем страницу {url}")
     driver.get(url)
 
     # Ожидание загрузки элементов на странице
@@ -25,12 +27,22 @@ while True:
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div[itemprop='itemListElement']"))
         )
     except Exception as e:
-        print(f"Ошибка при ожидании элементов: {e}")
+        print("Товары не найдены.")
+        #traceback.print_exc()  # Вывод полного стека вызовов ошибки
+        try:
+            p404 = driver.find_element(By.CLASS_NAME, "MAb3P")
+            if p404:
+                print(f"Страница {url} не существует")
+        except Exception as e:
+            print(f"Произошла ошибка: {e}")
+        break # Если товаров нет, выходим из цикла
 
     products = driver.find_elements(By.CSS_SELECTOR, "div[itemprop='itemListElement']")
     if not products:
-        break  # Если элементов нет, выходим из цикла
+        print("Товары не найдены")
+        break  # Если товаров нет, выходим из цикла
 
+    print(f"Найдено {len(products)} товаров на странице {page_number}. Начинаем парсинг...")
     for product in products:
         try:
             # Поиск элемента с классом 'wYUX2'
@@ -52,6 +64,7 @@ while True:
             print(f"Ошибка при получении ссылки: {e}")
         product_info_list.append([name, price, link])
 
+    print(f"Страница {page_number} успешно обработана. Переходим на следующую страницу...")
     page_number += 1
 
 # Закрытие браузера
@@ -66,6 +79,6 @@ try:
         writer = csv.writer(csvfile)
         writer.writerow(csv_columns) # Создаём первый ряд
         writer.writerows(product_info_list) # Прописываем использование списка как источника для рядов таблицы
-    print(f"Данные успешно сохранены в {csv_file}")
+    print(f"\nДанные успешно сохранены в {csv_file}")
 except IOError:
-    print("Ошибка при записи в файл")
+    print("\nОшибка при записи в файл")
